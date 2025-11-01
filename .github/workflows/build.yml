@@ -1,0 +1,57 @@
+name: Build iWheb Auth Client
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build JavaScript files
+      run: |
+        cd js
+        ./build.sh
+        
+    - name: Check if files were built
+      run: |
+        cd js
+        if [ ! -f "iwheb-auth.js" ] || [ ! -f "iwheb-auth.min.js" ]; then
+          echo "❌ Build failed: Output files not found"
+          exit 1
+        fi
+        echo "✅ Build successful"
+        echo "📊 File sizes:"
+        ls -lh iwheb-auth.js iwheb-auth.min.js
+        
+    - name: Commit and push if changes
+      if: github.ref == 'refs/heads/main'
+      run: |
+        cd js
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Check if there are changes to commit
+        if git diff --quiet iwheb-auth.js iwheb-auth.min.js; then
+          echo "No changes to commit"
+        else
+          git add iwheb-auth.js iwheb-auth.min.js
+          git commit -m "🤖 Auto-build: Update standalone and minified JS files"
+          git push
+        fi
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: iwheb-auth-client
+        path: |
+          js/iwheb-auth.js
+          js/iwheb-auth.min.js
+          js/demo.html
+          js/README.md
