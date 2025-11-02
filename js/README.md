@@ -5,7 +5,7 @@ Standalone JavaScript client for iWheb Authentication Service.
 ## Usage
 
 ```html
-<script src="iwheb-auth.min.js"></script>
+<script src="iwheb-auth.js"></script>
 <script>
 const client = new IWebAuthClient({
     baseUrl: 'https://api.example.com',
@@ -29,7 +29,7 @@ const userInfo = await client.getUserInfo(validate.data.session_id);
 
 ## Files
 
-- `iwheb-auth.min.js` - Production version (5.8 KB)
+- `iwheb-auth.js` - Production version (5.8 KB)
 - `demo.html` - Interactive demo
 
 ## Build

@@ -46,7 +46,7 @@ class IWebAuthClient {
      * @returns {Promise<Object>} New session information
      */
     async touchSession(sessionId) {
-        return await this.httpClient.post(`/session/touch/${sessionId}`);
+        return await this.httpClient.get(`/session/touch/${sessionId}`);
     }
 
     /**
@@ -62,12 +62,12 @@ class IWebAuthClient {
     }
 
     /**
-     * Logout and delete session
+     * End session (logout)
      * @param {string} sessionId - Session ID
-     * @returns {Promise<Object>} Success response
+     * @returns {Promise<Object>} Logout response
      */
     async logout(sessionId) {
-        return await this.httpClient.post(`/session/logout/${sessionId}`);
+        return await this.httpClient.get(`/session/logout/${sessionId}`);
     }
 
     /**
@@ -76,7 +76,7 @@ class IWebAuthClient {
      * @returns {Promise<Object>} User information
      */
     async getUserInfo(sessionId) {
-        return await this.httpClient.post(`/user/${sessionId}/info`);
+        return await this.httpClient.get(`/user/${sessionId}/info`);
     }
 
     /**
