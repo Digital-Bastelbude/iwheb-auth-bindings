@@ -134,7 +134,7 @@ class IWebAuthClient {
      * @returns {Promise<Object>} New session information
      */
     async touchSession(sessionId) {
-        return await this.httpClient.get(`/session/touch/${sessionId}`);
+        return await this.httpClient.post(`/session/touch/${sessionId}`);
     }
 
     /**
@@ -155,7 +155,7 @@ class IWebAuthClient {
      * @returns {Promise<Object>} Logout response
      */
     async logout(sessionId) {
-        return await this.httpClient.get(`/session/logout/${sessionId}`);
+        return await this.httpClient.post(`/session/logout/${sessionId}`);
     }
 
     /**
@@ -173,7 +173,7 @@ class IWebAuthClient {
      * @returns {Promise<Object>} User token
      */
     async getUserToken(sessionId) {
-        return await this.httpClient.post(`/user/${sessionId}/token`);
+        return await this.httpClient.get(`/user/${sessionId}/token`);
     }
 
     /**
