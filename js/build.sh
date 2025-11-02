@@ -3,7 +3,7 @@
 echo "🚀 Building iWheb Auth Client..."
 
 # Clean up old builds
-rm -f iwheb-auth.js iwheb-auth.min.js
+rm -f iwheb-auth.js
 
 echo "📦 Building standalone version..."
 
@@ -30,24 +30,17 @@ echo "" >> iwheb-auth.js
 echo "// === Main Auth Client ===" >> iwheb-auth.js
 cat src/client.js >> iwheb-auth.js
 
-echo "🗜️  Building minified version..."
+# Get file size
+NORMAL_SIZE=$(wc -c < iwheb-auth.js)
 
-# Create a proper minified version
-python3 << 'EOF'
-import re
-
-def minify_js(content):
-    # Remove multi-line comments /* ... */
-    content = re.sub(r'/\*.*?\*/', '', content, flags=re.DOTALL)
-    
-    # Remove single-line comments // but preserve URLs
-    lines = content.split('\n')
-    result_lines = []
-    
-    for line in lines:
-        # Skip lines that are only comments
-        if re.match(r'^\s*//.*$', line):
-            continue
+echo "✅ Build completed successfully!"
+echo ""
+echo "📊 Build Results:"
+echo "   📄 iwheb-auth.js:     ${NORMAL_SIZE} bytes"
+echo ""
+echo "🎯 Files ready for deployment:"
+echo "   • Copy iwheb-auth.js to your webspace"
+echo "   • Use demo.html to test the implementation"
             
         # Remove end-of-line comments but preserve URLs
         if '//' in line:
