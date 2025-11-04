@@ -93,11 +93,26 @@
                 grid-template-columns: 1fr;
             }
         }
+        .utc-time {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #0056b3;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <h1>🚀 iWheb Auth Client Demo</h1>
     <p>Test all iWheb Authentication Service endpoints</p>
+    
+    <!-- UTC Time Display -->
+    <div class="utc-time" id="utcTime">
+        🌍 Current UTC Time: <span id="utcTimeValue">Loading...</span>
+    </div>
 
     <!-- Configuration Section -->
     <div class="section">
@@ -437,8 +452,30 @@
             }
         }
 
+        // UTC Time Display Functions
+        function updateUTCTime() {
+            const now = new Date();
+            const utcString = now.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, ' UTC');
+            document.getElementById('utcTimeValue').textContent = utcString;
+        }
+
+        function startUTCClock() {
+            updateUTCTime(); // Initial update
+            setInterval(updateUTCTime, 500); // Update every 500ms
+        }
+
         // Initialize on page load
         showStatus('Enter your API configuration and click "Initialize Client" to start', 'info');
+        
+        // Start UTC clock when page loads
+        document.addEventListener('DOMContentLoaded', startUTCClock);
+        // Also start immediately in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            // Do nothing, wait for DOMContentLoaded
+        } else {
+            // DOMContentLoaded has already fired
+            startUTCClock();
+        }
     </script>
 </body>
 </html>
