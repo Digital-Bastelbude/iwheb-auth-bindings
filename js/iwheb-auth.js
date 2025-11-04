@@ -184,7 +184,7 @@ class IWebAuthClient {
     async isSessionActive(sessionId) {
         try {
             const response = await this.checkSession(sessionId);
-            return response.data && response.data.active === true;
+            return response && response.active === true;
         } catch {
             return false;
         }
