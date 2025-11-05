@@ -189,6 +189,7 @@
         </div>
         <button onclick="getUserInfo()" id="userInfoBtn" disabled>Get User Info</button>
         <button onclick="getUserToken()" id="userTokenBtn" disabled>Get User Token</button>
+        <button onclick="getUserId()" id="userIdBtn" disabled>Get User ID</button>
     </div>
 
     <!-- Response Section -->
@@ -226,7 +227,7 @@
         }
 
         function enableButtons(enabled) {
-            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn'];
+            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn', 'userIdBtn'];
             buttons.forEach(id => {
                 document.getElementById(id).disabled = !enabled;
             });
@@ -449,6 +450,31 @@
             } catch (error) {
                 showResponse({error: error.message});
                 showStatus(`Get user token failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function getUserId() {
+            const sessionId = document.getElementById('sessionIdForUser').value.trim();
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Getting user ID...', 'info');
+                const response = await client.getUserId(sessionId);
+                showResponse(response);
+                showStatus('User ID retrieved successfully', 'success');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Get user ID failed: ${error.message}`, 'error');
             }
         }
 

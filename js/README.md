@@ -24,8 +24,13 @@ const userInfo = await client.getUserInfo(validate.data.session_id);
 - `login(email)` - Start login process
 - `validate(sessionId, code)` - Validate 6-digit code  
 - `checkSession(sessionId)` - Check if session is active
-- `getUserInfo(sessionId)` - Get user information
+- `touchSession(sessionId)` - Refresh session (extend expiry)
+- `createDelegatedSession(sessionId, targetApiKey)` - Create delegated session
+- `getUserInfo(sessionId)` - Get user information from Webling
+- `getUserToken(sessionId)` - Get encrypted user token
+- `getUserId(sessionId)` - Get decrypted Webling user ID
 - `logout(sessionId)` - End session
+- `isSessionActive(sessionId)` - Helper to check if session is active (returns boolean)
 
 ## Files
 

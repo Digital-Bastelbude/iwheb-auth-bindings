@@ -89,6 +89,15 @@ class IWebAuthClient {
     }
 
     /**
+     * Get decrypted Webling user ID
+     * @param {string} sessionId - Session ID
+     * @returns {Promise<Object>} User ID with new session
+     */
+    async getUserId(sessionId) {
+        return await this.httpClient.get(`/user/${sessionId}/id`);
+    }
+
+    /**
      * Helper: Check if session is active (simplified)
      * @param {string} sessionId - Session ID
      * @returns {Promise<boolean>} True if session is active
