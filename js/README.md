@@ -29,6 +29,7 @@ const userInfo = await client.getUserInfo(validate.data.session_id);
 - `getUserInfo(sessionId)` - Get user information from Webling
 - `getUserToken(sessionId)` - Get encrypted user token
 - `getUserId(sessionId)` - Get decrypted Webling user ID
+- `getUserProperties(sessionId, properties)` - Get selective user properties from Webling (properties can be array or comma-separated string)
 - `logout(sessionId)` - End session
 - `isSessionActive(sessionId)` - Helper to check if session is active (returns boolean)
 

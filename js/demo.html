@@ -190,6 +190,12 @@
         <button onclick="getUserInfo()" id="userInfoBtn" disabled>Get User Info</button>
         <button onclick="getUserToken()" id="userTokenBtn" disabled>Get User Token</button>
         <button onclick="getUserId()" id="userIdBtn" disabled>Get User ID</button>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="userProperties">Properties (comma-separated):</label>
+            <input type="text" id="userProperties" placeholder="Vorname,Name,E-Mail" value="Vorname,Name,E-Mail">
+        </div>
+        <button onclick="getUserProperties()" id="userPropertiesBtn" disabled>Get User Properties</button>
     </div>
 
     <!-- Response Section -->
@@ -227,7 +233,7 @@
         }
 
         function enableButtons(enabled) {
-            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn', 'userIdBtn'];
+            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn', 'userIdBtn', 'userPropertiesBtn'];
             buttons.forEach(id => {
                 document.getElementById(id).disabled = !enabled;
             });
@@ -475,6 +481,39 @@
             } catch (error) {
                 showResponse({error: error.message});
                 showStatus(`Get user ID failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function getUserProperties() {
+            const sessionId = document.getElementById('sessionIdForUser').value.trim();
+            const properties = document.getElementById('userProperties').value.trim();
+            
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+            
+            if (!properties) {
+                showStatus('Please enter at least one property', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Getting user properties...', 'info');
+                const propertiesArray = properties.split(',').map(p => p.trim()).filter(p => p);
+                const response = await client.getUserProperties(sessionId, propertiesArray);
+                showResponse(response);
+                showStatus('User properties retrieved successfully', 'success');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Get user properties failed: ${error.message}`, 'error');
             }
         }
 

@@ -186,6 +186,17 @@ class IWebAuthClient {
     }
 
     /**
+     * Get selective user properties from Webling
+     * @param {string} sessionId - Session ID
+     * @param {string[]} properties - Array of property names to retrieve
+     * @returns {Promise<Object>} User properties with new session
+     */
+    async getUserProperties(sessionId, properties) {
+        const propertiesParam = Array.isArray(properties) ? properties.join(',') : properties;
+        return await this.httpClient.get(`/user/${sessionId}/properties?properties=${encodeURIComponent(propertiesParam)}`);
+    }
+
+    /**
      * Helper: Check if session is active (simplified)
      * @param {string} sessionId - Session ID
      * @returns {Promise<boolean>} True if session is active
