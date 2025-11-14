@@ -198,6 +198,28 @@
         <button onclick="getUserProperties()" id="userPropertiesBtn" disabled>Get User Properties</button>
     </div>
 
+    <!-- Membergroup Section -->
+    <div class="section">
+        <h3>👥 Membergroup</h3>
+        
+        <div class="form-group">
+            <label for="sessionIdForMembergroup">Session ID:</label>
+            <input type="text" id="sessionIdForMembergroup" placeholder="session-id">
+        </div>
+        
+        <div class="form-group">
+            <label for="membergroupId">Membergroup ID:</label>
+            <input type="number" id="membergroupId" placeholder="123">
+        </div>
+        <button onclick="getMembergroup()" id="membergroupBtn" disabled>Get Membergroup Info</button>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="membergroupName">Membergroup Name:</label>
+            <input type="text" id="membergroupName" placeholder="Vorstand">
+        </div>
+        <button onclick="checkMembership()" id="membershipBtn" disabled>Check Membership</button>
+    </div>
+
     <!-- Response Section -->
     <div class="section">
         <h3>📋 Response</h3>
@@ -233,7 +255,7 @@
         }
 
         function enableButtons(enabled) {
-            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn', 'userIdBtn', 'userPropertiesBtn'];
+            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn', 'userIdBtn', 'userPropertiesBtn', 'membergroupBtn', 'membershipBtn'];
             buttons.forEach(id => {
                 document.getElementById(id).disabled = !enabled;
             });
@@ -514,6 +536,74 @@
             } catch (error) {
                 showResponse({error: error.message});
                 showStatus(`Get user properties failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function getMembergroup() {
+            const sessionId = document.getElementById('sessionIdForMembergroup').value.trim();
+            const membergroupId = document.getElementById('membergroupId').value.trim();
+            
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+            
+            if (!membergroupId) {
+                showStatus('Please enter a Membergroup ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Getting membergroup info...', 'info');
+                const response = await client.getMembergroup(sessionId, membergroupId);
+                showResponse(response);
+                showStatus('Membergroup info retrieved successfully', 'success');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForMembergroup').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Get membergroup failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkMembership() {
+            const sessionId = document.getElementById('sessionIdForMembergroup').value.trim();
+            const membergroupName = document.getElementById('membergroupName').value.trim();
+            
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+            
+            if (!membergroupName) {
+                showStatus('Please enter a Membergroup Name', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Checking membership...', 'info');
+                const response = await client.checkMembership(sessionId, membergroupName);
+                showResponse(response);
+                
+                const isMember = response.data && response.data.is_member;
+                showStatus(`User is ${isMember ? '' : 'NOT '}a member of "${membergroupName}"`, isMember ? 'success' : 'info');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForMembergroup').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Membership check failed: ${error.message}`, 'error');
             }
         }
 

@@ -197,6 +197,26 @@ class IWebAuthClient {
     }
 
     /**
+     * Get membergroup information from Webling
+     * @param {string} sessionId - Session ID
+     * @param {number} membergroupId - Membergroup ID
+     * @returns {Promise<Object>} Membergroup data with new session
+     */
+    async getMembergroup(sessionId, membergroupId) {
+        return await this.httpClient.get(`/membergroup/${sessionId}/${membergroupId}`);
+    }
+
+    /**
+     * Check if authenticated user is member of a membergroup
+     * @param {string} sessionId - Session ID
+     * @param {string} membergroupName - Membergroup name
+     * @returns {Promise<Object>} Membership check result with new session
+     */
+    async checkMembership(sessionId, membergroupName) {
+        return await this.httpClient.get(`/membergroup/${sessionId}/${encodeURIComponent(membergroupName)}/member`);
+    }
+
+    /**
      * Helper: Check if session is active (simplified)
      * @param {string} sessionId - Session ID
      * @returns {Promise<boolean>} True if session is active
