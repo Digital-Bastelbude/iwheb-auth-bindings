@@ -12,8 +12,11 @@ const client = new IWebAuthClient({
     apiKey: 'your-api-key'
 });
 
-// Complete login flow
+// Complete login flow with email (default)
 const login = await client.login('user@example.com');
+// Or with SMS
+// const login = await client.login('+41123456789', 'sms');
+
 const validate = await client.validate(login.data.session_id, '123456');
 const userInfo = await client.getUserInfo(validate.data.session_id);
 </script>
@@ -21,7 +24,7 @@ const userInfo = await client.getUserInfo(validate.data.session_id);
 
 ## API Methods
 
-- `login(email)` - Start login process
+- `login(identifier, provider)` - Start login process with email (default) or SMS. Provider can be 'email' or 'sms'
 - `validate(sessionId, code)` - Validate 6-digit code  
 - `checkSession(sessionId)` - Check if session is active
 - `touchSession(sessionId)` - Refresh session (extend expiry)
