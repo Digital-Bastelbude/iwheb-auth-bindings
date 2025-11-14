@@ -62,9 +62,9 @@ class IWebAuthClient {
     }
 
     /**
-     * Logout and delete session
+     * End session (logout)
      * @param {string} sessionId - Session ID
-     * @returns {Promise<Object>} Success response
+     * @returns {Promise<Object>} Logout response
      */
     async logout(sessionId) {
         return await this.httpClient.post(`/session/logout/${sessionId}`);
@@ -76,7 +76,7 @@ class IWebAuthClient {
      * @returns {Promise<Object>} User information
      */
     async getUserInfo(sessionId) {
-        return await this.httpClient.post(`/user/${sessionId}/info`);
+        return await this.httpClient.get(`/user/${sessionId}/info`);
     }
 
     /**
@@ -85,7 +85,47 @@ class IWebAuthClient {
      * @returns {Promise<Object>} User token
      */
     async getUserToken(sessionId) {
-        return await this.httpClient.post(`/user/${sessionId}/token`);
+        return await this.httpClient.get(`/user/${sessionId}/token`);
+    }
+
+    /**
+     * Get decrypted Webling user ID
+     * @param {string} sessionId - Session ID
+     * @returns {Promise<Object>} User ID with new session
+     */
+    async getUserId(sessionId) {
+        return await this.httpClient.get(`/user/${sessionId}/id`);
+    }
+
+    /**
+     * Get selective user properties from Webling
+     * @param {string} sessionId - Session ID
+     * @param {string[]} properties - Array of property names to retrieve
+     * @returns {Promise<Object>} User properties with new session
+     */
+    async getUserProperties(sessionId, properties) {
+        const propertiesParam = Array.isArray(properties) ? properties.join(',') : properties;
+        return await this.httpClient.get(`/user/${sessionId}/properties?properties=${encodeURIComponent(propertiesParam)}`);
+    }
+
+    /**
+     * Get membergroup information from Webling
+     * @param {string} sessionId - Session ID
+     * @param {number} membergroupId - Membergroup ID
+     * @returns {Promise<Object>} Membergroup data with new session
+     */
+    async getMembergroup(sessionId, membergroupId) {
+        return await this.httpClient.get(`/membergroup/${sessionId}/${membergroupId}`);
+    }
+
+    /**
+     * Check if authenticated user is member of a membergroup
+     * @param {string} sessionId - Session ID
+     * @param {string} membergroupName - Membergroup name
+     * @returns {Promise<Object>} Membership check result with new session
+     */
+    async checkMembership(sessionId, membergroupName) {
+        return await this.httpClient.get(`/membergroup/${sessionId}/${encodeURIComponent(membergroupName)}/member`);
     }
 
     /**
@@ -96,7 +136,7 @@ class IWebAuthClient {
     async isSessionActive(sessionId) {
         try {
             const response = await this.checkSession(sessionId);
-            return response.data && response.data.active === true;
+            return response && response.active === true;
         } catch {
             return false;
         }

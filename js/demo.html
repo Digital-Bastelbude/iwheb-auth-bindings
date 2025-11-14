@@ -93,18 +93,33 @@
                 grid-template-columns: 1fr;
             }
         }
+        .utc-time {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #0056b3;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <h1>🚀 iWheb Auth Client Demo</h1>
     <p>Test all iWheb Authentication Service endpoints</p>
+    
+    <!-- UTC Time Display -->
+    <div class="utc-time" id="utcTime">
+        🌍 Current UTC Time: <span id="utcTimeValue">Loading...</span>
+    </div>
 
     <!-- Configuration Section -->
     <div class="section">
         <h3>⚙️ Configuration</h3>
         <div class="form-group">
             <label for="baseUrl">API Base URL:</label>
-            <input type="text" id="baseUrl" value="https://api.example.com" placeholder="https://api.example.com">
+            <input type="text" id="baseUrl" value="http://localhost:8080" placeholder="https://api.example.com">
         </div>
         <div class="form-group">
             <label for="apiKey">API Key:</label>
@@ -174,6 +189,35 @@
         </div>
         <button onclick="getUserInfo()" id="userInfoBtn" disabled>Get User Info</button>
         <button onclick="getUserToken()" id="userTokenBtn" disabled>Get User Token</button>
+        <button onclick="getUserId()" id="userIdBtn" disabled>Get User ID</button>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="userProperties">Properties (comma-separated):</label>
+            <input type="text" id="userProperties" placeholder="Vorname,Name,E-Mail" value="Vorname,Name,E-Mail">
+        </div>
+        <button onclick="getUserProperties()" id="userPropertiesBtn" disabled>Get User Properties</button>
+    </div>
+
+    <!-- Membergroup Section -->
+    <div class="section">
+        <h3>👥 Membergroup</h3>
+        
+        <div class="form-group">
+            <label for="sessionIdForMembergroup">Session ID:</label>
+            <input type="text" id="sessionIdForMembergroup" placeholder="session-id">
+        </div>
+        
+        <div class="form-group">
+            <label for="membergroupId">Membergroup ID:</label>
+            <input type="number" id="membergroupId" placeholder="123">
+        </div>
+        <button onclick="getMembergroup()" id="membergroupBtn" disabled>Get Membergroup Info</button>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="membergroupName">Membergroup Name:</label>
+            <input type="text" id="membergroupName" placeholder="Vorstand">
+        </div>
+        <button onclick="checkMembership()" id="membershipBtn" disabled>Check Membership</button>
     </div>
 
     <!-- Response Section -->
@@ -211,7 +255,7 @@
         }
 
         function enableButtons(enabled) {
-            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn'];
+            const buttons = ['loginBtn', 'validateBtn', 'logoutBtn', 'checkBtn', 'touchBtn', 'activeBtn', 'delegateBtn', 'userInfoBtn', 'userTokenBtn', 'userIdBtn', 'userPropertiesBtn', 'membergroupBtn', 'membershipBtn'];
             buttons.forEach(id => {
                 document.getElementById(id).disabled = !enabled;
             });
@@ -437,8 +481,156 @@
             }
         }
 
+        async function getUserId() {
+            const sessionId = document.getElementById('sessionIdForUser').value.trim();
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Getting user ID...', 'info');
+                const response = await client.getUserId(sessionId);
+                showResponse(response);
+                showStatus('User ID retrieved successfully', 'success');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Get user ID failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function getUserProperties() {
+            const sessionId = document.getElementById('sessionIdForUser').value.trim();
+            const properties = document.getElementById('userProperties').value.trim();
+            
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+            
+            if (!properties) {
+                showStatus('Please enter at least one property', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Getting user properties...', 'info');
+                const propertiesArray = properties.split(',').map(p => p.trim()).filter(p => p);
+                const response = await client.getUserProperties(sessionId, propertiesArray);
+                showResponse(response);
+                showStatus('User properties retrieved successfully', 'success');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Get user properties failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function getMembergroup() {
+            const sessionId = document.getElementById('sessionIdForMembergroup').value.trim();
+            const membergroupId = document.getElementById('membergroupId').value.trim();
+            
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+            
+            if (!membergroupId) {
+                showStatus('Please enter a Membergroup ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Getting membergroup info...', 'info');
+                const response = await client.getMembergroup(sessionId, membergroupId);
+                showResponse(response);
+                showStatus('Membergroup info retrieved successfully', 'success');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForMembergroup').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Get membergroup failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkMembership() {
+            const sessionId = document.getElementById('sessionIdForMembergroup').value.trim();
+            const membergroupName = document.getElementById('membergroupName').value.trim();
+            
+            if (!sessionId) {
+                showStatus('Please enter a Session ID', 'error');
+                return;
+            }
+            
+            if (!membergroupName) {
+                showStatus('Please enter a Membergroup Name', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Checking membership...', 'info');
+                const response = await client.checkMembership(sessionId, membergroupName);
+                showResponse(response);
+                
+                const isMember = response.data && response.data.is_member;
+                showStatus(`User is ${isMember ? '' : 'NOT '}a member of "${membergroupName}"`, isMember ? 'success' : 'info');
+                
+                // Update session ID if rotated
+                if (response.data && response.data.session_id) {
+                    document.getElementById('sessionIdForMembergroup').value = response.data.session_id;
+                    document.getElementById('sessionId').value = response.data.session_id;
+                    document.getElementById('sessionIdForCheck').value = response.data.session_id;
+                    document.getElementById('sessionIdForUser').value = response.data.session_id;
+                }
+            } catch (error) {
+                showResponse({error: error.message});
+                showStatus(`Membership check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // UTC Time Display Functions
+        function updateUTCTime() {
+            const now = new Date();
+            const utcString = now.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, ' UTC');
+            document.getElementById('utcTimeValue').textContent = utcString;
+        }
+
+        function startUTCClock() {
+            updateUTCTime(); // Initial update
+            setInterval(updateUTCTime, 500); // Update every 500ms
+        }
+
         // Initialize on page load
         showStatus('Enter your API configuration and click "Initialize Client" to start', 'info');
+        
+        // Start UTC clock when page loads
+        document.addEventListener('DOMContentLoaded', startUTCClock);
+        // Also start immediately in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            // Do nothing, wait for DOMContentLoaded
+        } else {
+            // DOMContentLoaded has already fired
+            startUTCClock();
+        }
     </script>
 </body>
 </html>
