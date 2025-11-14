@@ -142,21 +142,16 @@
             <h3>🔐 Authentication</h3>
             
             <div class="form-group">
-                <label for="provider">Validation Provider:</label>
-                <select id="provider" onchange="toggleLoginFields()">
-                    <option value="email">Email</option>
-                    <option value="sms">SMS</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="emailGroup">
-                <label for="email">Email:</label>
+                <label for="email">Email (user identification):</label>
                 <input type="email" id="email" placeholder="user@example.com">
             </div>
             
-            <div class="form-group" id="phoneGroup" style="display: none;">
-                <label for="phone">Phone (international format):</label>
-                <input type="tel" id="phone" placeholder="+41123456789">
+            <div class="form-group">
+                <label for="provider">Code Delivery Method:</label>
+                <select id="provider">
+                    <option value="email">Send via Email</option>
+                    <option value="sms">Send via SMS</option>
+                </select>
             </div>
             
             <button onclick="login()" id="loginBtn" disabled>Start Login</button>
@@ -302,44 +297,21 @@
             }
         }
 
-        function toggleLoginFields() {
-            const provider = document.getElementById('provider').value;
-            const emailGroup = document.getElementById('emailGroup');
-            const phoneGroup = document.getElementById('phoneGroup');
-            
-            if (provider === 'sms') {
-                emailGroup.style.display = 'none';
-                phoneGroup.style.display = 'block';
-            } else {
-                emailGroup.style.display = 'block';
-                phoneGroup.style.display = 'none';
-            }
-        }
-
         async function login() {
+            const email = document.getElementById('email').value.trim();
             const provider = document.getElementById('provider').value;
-            let identifier;
-            let identifierType;
             
-            if (provider === 'sms') {
-                identifier = document.getElementById('phone').value.trim();
-                identifierType = 'phone number';
-            } else {
-                identifier = document.getElementById('email').value.trim();
-                identifierType = 'email address';
-            }
-            
-            if (!identifier) {
-                showStatus(`Please enter a ${identifierType}`, 'error');
+            if (!email) {
+                showStatus('Please enter an email address', 'error');
                 return;
             }
 
             try {
                 showStatus('Sending login request...', 'info');
-                const response = await client.login(identifier, provider);
+                const response = await client.login(email, provider);
                 showResponse(response);
                 
-                const medium = provider === 'sms' ? 'SMS' : 'email';
+                const medium = provider === 'sms' ? 'SMS (from Webling Mobile field)' : 'email';
                 showStatus(`Login successful! Check your ${medium} for the code.`, 'success');
                 
                 // Auto-fill session ID

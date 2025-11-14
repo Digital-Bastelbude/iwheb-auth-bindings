@@ -13,18 +13,16 @@ class IWebAuthClient {
 
     /**
      * Initiate login with validation code
-     * @param {string} identifier - Email address or phone number
+     * @param {string} email - User email address (always required for user identification)
      * @param {string} provider - Validation provider: 'email' (default) or 'sms'
      * @returns {Promise<Object>} Login response with session_id
      */
-    async login(identifier, provider = 'email') {
-        const encodedIdentifier = Base64Utils.encode(identifier);
-        const payload = { provider };
+    async login(email, provider = 'email') {
+        const encodedEmail = Base64Utils.encode(email);
+        const payload = { email: encodedEmail };
         
-        if (provider === 'sms') {
-            payload.phone = encodedIdentifier;
-        } else {
-            payload.email = encodedIdentifier;
+        if (provider && provider !== 'email') {
+            payload.provider = provider;
         }
         
         return await this.httpClient.post('/login', payload);
